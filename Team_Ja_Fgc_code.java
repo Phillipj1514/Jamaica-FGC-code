@@ -22,8 +22,10 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
     private DcMotor linearSlide_motor1;
     private DcMotor linearSlide_motor2;
     private Servo orangeGate_servo;
-    private DcMotor blueGate;
-
+//    private DcMotor blueGate;
+    private DcMotor frontRight;
+    private DcMotor frontLeft;
+    private Servo blueGateServo;
     //variables
     private boolean elevator_on, manual_mode = false;
     public boolean bGate_open = false, oGate_open = false;
@@ -43,24 +45,30 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         right_Motor = hardwareMap.dcMotor.get("right_drive");
         color_sensor = hardwareMap.colorSensor.get("color_sensor");
         color_servo = hardwareMap.servo.get("col_servo");
-        blueGate = hardwareMap.dcMotor.get("blue_gate");
+//        blueGate = hardwareMap.dcMotor.get("blue_gate");
         orangeGate_servo = hardwareMap.servo.get("orange_gate");
         color_sensor_motor = hardwareMap.dcMotor.get("col_motor");
         color_sensor_motor2 = hardwareMap.dcMotor.get("col_motor2");
         linearSlide_motor1 = hardwareMap.dcMotor.get("linearslide1");
         linearSlide_motor2 = hardwareMap.dcMotor.get("linearslide2");
-
+        frontRight= hardwareMap.dcMotor.get("frontright");
+        frontLeft= hardwareMap.dcMotor.get("frontleft");
+        blueGateServo=hardwareMap.servo.get("blueGateServo");
         //motor and sensor configuration
         right_Motor.setDirection(DcMotorSimple.Direction.REVERSE);
         linearSlide_motor1.setDirection(DcMotorSimple.Direction.REVERSE);
         color_servo.setDirection(FORWARD);
+        blueGateServo.setDirection(FORWARD);
         orangeGate_servo.setDirection(FORWARD);
         left_Motor.setPower(0);            // initialize motors to zero powers
         right_Motor.setPower(0);
+        frontRight.setPower(0.0);
+        frontLeft.setPower(0.0);
         color_sensor_motor.setPower(0);
         color_sensor_motor2.setPower(0);
         color_servo.setPosition(0.5);
         orangeGate_servo.setPosition(0);
+        blueGateServo.setPosition(0.5);
 
 
         //variable initialization
@@ -86,6 +94,10 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
                 color_value_argb = color_sensor.argb();
                 left = -gamepad1.left_stick_y;
                 right = -gamepad1.right_stick_y;
+
+
+
+
                 motion = -gamepad2.left_stick_y;
 
                 //controller command function and functionality
@@ -141,13 +153,17 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         }
         left_Motor.setPower(left);
         right_Motor.setPower(right);
+        frontLeft.setPower(left);
+        frontRight.setPower(right);
 
         // let the robot brake whenever it stop moving
-        if(left == 0)
+        if(left == 0) {
             left_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        if(right == 0)
+            frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }else if (right==0){
             right_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }
     }
 
     private void ball_Elevator(int minimum_distance, double power){
@@ -213,12 +229,12 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
             }
         }
         // Mode to collect just blue balls
-        if (gamepad2.dpad_up) { // Turn the servo to the blue ball storage and hold
+        if (gamepad1.dpad_up) { // Turn the servo to the blue ball storage and hold
             manual_mode = false;
             color_servo.setPosition(0.7);
             telemetry.addData("say", "Blue ball only mode on");
         }
-        if (gamepad2.dpad_down) { // return the servo position to the neutral zone
+        if (gamepad1.dpad_down) { // return the servo position to the neutral zone
             manual_mode = true;
             color_servo.setPosition(0.5);
             telemetry.addData("say", "Blue ball only mode off");
@@ -235,7 +251,7 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
             if (elevator_on) { // turn the elevator back on if the elevator was on
                 startElevator(power);//Anika
             }
-            
+
         } else if (color_red < color_blue && color_value_alpha >= minimum_distance && !manual_mode && !bGate_open) {// gate boolean added by Anika
             //If the blue ball is detected it pushes it to the blue ball storage
 
@@ -267,26 +283,29 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         linearSlide_motor2.setPower(0.0);
 
         // brake mode
-        linearSlide_motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        linearSlide_motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        not needed
+//        linearSlide_motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        linearSlide_motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     private void blueGateOpen(double power, int time){
         if(gamepad2.left_trigger > 0.5){
-        bGate_open = true;
-        blueGate.setPower(-power);
-        sleep(time);
-        blueGate.setPower(0);
-        stopElevator();
+            bGate_open = true;
+//            blueGate.setPower(-power);
+            blueGateServo.setPosition(-1.0);
+            sleep(time);
+//            blueGate.setPower(0);
+            stopElevator();
         }
     }
 
     private void blueGateClose(double power, int time){
         if(gamepad2.left_bumper) {
             bGate_open = false;
-            blueGate.setPower(power);
+            blueGateServo.setPosition(1.0);
+//            blueGate.setPower(power);
             sleep(time);
-            blueGate.setPower(0);
+//            blueGate.setPower(0);
         }
     }
 
@@ -305,7 +324,9 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
             orangeGate_servo.setPosition(position);
         }
     }
-
+    private void rampdrive(){
+//  SOME PROCESS
+    }
     //The Processor ticking time code
     /***
      * waitForTick implements a periodic delay. However, this acts like a metronome
@@ -325,3 +346,5 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         period.reset();
     }
 }
+
+
