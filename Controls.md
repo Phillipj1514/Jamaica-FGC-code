@@ -5,6 +5,8 @@
 Drive- Left Stick **Y AXIS** , Right Stick **Y AXIS**
 Ball Elevator Start - Right Bumper 
 Ball Elevator Stop- Left Bumper
+Blue Ball Mode Start- DPAD Up
+Blue Ball Mode Stop (_Neutral Mode_) - DPAD Down
 
 ## GAMEPAD2
 
@@ -19,9 +21,7 @@ Manual Mode (Color Sensor)- X
 
 Automatic Mode (Color Sensor)- Y 
 
-Blue Ball Mode Start- DPAD Up
 
-Blue Ball Mode Stop (_Neutral Mode_) - DPAD Down
 
 
 
