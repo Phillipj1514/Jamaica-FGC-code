@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import static com.qualcomm.robotcore.hardware.Servo.Direction.FORWARD;
 
-@TeleOp(name = "Team_Jamaica",group = "Prized_Bot") // The name of program and bot name
+@TeleOp(name = "Team_Jamaica2",group = "Prized_Bot") // The name of program and bot name
 public class Team_Ja_Fgc_code extends LinearOpMode {
     // Declaration of the objects to be used
     private ElapsedTime period = new ElapsedTime();
@@ -68,7 +68,7 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         color_sensor_motor2.setPower(0);
         color_servo.setPosition(0.5);
         orangeGate_servo.setPosition(0);
-        blueGateServo.setPosition(0.5);
+        blueGateServo.setPosition(1);
 
 
         //variable initialization
@@ -108,9 +108,9 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
 
                 sorting_System(minimum_distance,1.0,1.0,1.0); //sorting system
 
-                blueGateOpen(0.2,1000); //function to open the blue ball storage whenever the button is clicked
+                blueGateOpen(0.2,1300); //function to open the blue ball storage whenever the button is clicked
 
-                blueGateClose(0.2,3000); //function to close the blue ball storage whenever the button is clicked
+                blueGateClose(0.2,1200); //function to close the blue ball storage whenever the button is clicked
 
                 orangeGateOpen(0.7); //function to open the orange ball storage whenever the button is clicked
 
@@ -231,7 +231,7 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         // Mode to collect just blue balls
         if (gamepad1.dpad_up) { // Turn the servo to the blue ball storage and hold
             manual_mode = false;
-            color_servo.setPosition(0.7);
+            color_servo.setPosition(0.6);
             telemetry.addData("say", "Blue ball only mode on");
         }
         if (gamepad1.dpad_down) { // return the servo position to the neutral zone
@@ -283,13 +283,12 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         linearSlide_motor2.setPower(0.0);
 
         // brake mode
-//        not needed
-//        linearSlide_motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        linearSlide_motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        linearSlide_motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        linearSlide_motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     private void blueGateOpen(double power, int time){
-        if(gamepad2.left_trigger > 0.5){
+        if(gamepad2.left_trigger > 0.2){
             bGate_open = true;
 //            blueGate.setPower(-power);
             blueGateServo.setPosition(-1.0);
@@ -302,7 +301,7 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
     private void blueGateClose(double power, int time){
         if(gamepad2.left_bumper) {
             bGate_open = false;
-            blueGateServo.setPosition(1.0);
+            blueGateServo.setPosition(0.9699);
 //            blueGate.setPower(power);
             sleep(time);
 //            blueGate.setPower(0);
