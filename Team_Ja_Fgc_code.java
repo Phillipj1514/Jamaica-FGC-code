@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import static com.qualcomm.robotcore.hardware.Servo.Direction.FORWARD;
 
-@TeleOp(name = "Team_Jamaica2",group = "Prized_Bot") // The name of program and bot name
+@TeleOp(name = "Team_Jamaica",group = "Prize_Bot") // The name of program and bot name
 public class Team_Ja_Fgc_code extends LinearOpMode {
     // Declaration of the objects to be used
     private ElapsedTime period = new ElapsedTime();
@@ -22,7 +22,6 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
     private DcMotor linearSlide_motor1;
     private DcMotor linearSlide_motor2;
     private Servo orangeGate_servo;
-//    private DcMotor blueGate;
     private DcMotor frontRight;
     private DcMotor frontLeft;
     private Servo blueGateServo;
@@ -45,7 +44,6 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         right_Motor = hardwareMap.dcMotor.get("right_drive");
         color_sensor = hardwareMap.colorSensor.get("color_sensor");
         color_servo = hardwareMap.servo.get("col_servo");
-//        blueGate = hardwareMap.dcMotor.get("blue_gate");
         orangeGate_servo = hardwareMap.servo.get("orange_gate");
         color_sensor_motor = hardwareMap.dcMotor.get("col_motor");
         color_sensor_motor2 = hardwareMap.dcMotor.get("col_motor2");
@@ -54,6 +52,7 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         frontRight= hardwareMap.dcMotor.get("frontright");
         frontLeft= hardwareMap.dcMotor.get("frontleft");
         blueGateServo=hardwareMap.servo.get("blueGateServo");
+
         //motor and sensor configuration
         right_Motor.setDirection(DcMotorSimple.Direction.REVERSE);
         linearSlide_motor1.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -69,7 +68,6 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         color_servo.setPosition(0.5);
         orangeGate_servo.setPosition(0);
         blueGateServo.setPosition(1);
-
 
         //variable initialization
         double left = 0.0;
@@ -94,10 +92,6 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
                 color_value_argb = color_sensor.argb();
                 left = -gamepad1.left_stick_y;
                 right = -gamepad1.right_stick_y;
-
-
-
-
                 motion = -gamepad2.left_stick_y;
 
                 //controller command function and functionality
@@ -106,11 +100,11 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
 
                 ball_Elevator(minimum_distance,1.0); //elevator system for the balls
 
-                sorting_System(minimum_distance,1.0,1.0,1.0); //sorting system
+                sorting_System(minimum_distance,1.0,1.0,1.0,700,300); //sorting system
 
-                blueGateOpen(0.2,1300); //function to open the blue ball storage whenever the button is clicked
+                blueGateOpen(1.0); //function to open the blue ball storage whenever the button is clicked
 
-                blueGateClose(0.2,1200); //function to close the blue ball storage whenever the button is clicked
+                blueGateClose(0.9699); //function to close the blue ball storage whenever the button is clicked
 
                 orangeGateOpen(0.7); //function to open the orange ball storage whenever the button is clicked
 
@@ -195,7 +189,7 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         color_sensor_motor2.setPower(-power);
     }
 
-    private void sorting_System(int minimum_distance, double orange_ball_position, double blue_ball_position,double power){
+    private void sorting_System(int minimum_distance, double orange_ball_position, double blue_ball_position,double power, int sleep1, int sleep2){
         // The codes for the sorting action
         if (gamepad2.x) { // Turn on manual mode for the sorting system
             manual_mode = true;
@@ -209,10 +203,10 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         if (gamepad2.right_stick_x > 0.5) { // Turn the servo to the blue ball storage
 
             color_servo.setPosition(blue_ball_position);
-            sleep(1000);
+            sleep(sleep1);
             color_servo.setPosition(0.5);
             telemetry.addData("say", "Blue ball score");
-            sleep(1500);
+            sleep(sleep2);
             if (elevator_on) { // turn the elevator back on if the elevator was on
                 startElevator(power);//Anika
             }
@@ -220,10 +214,10 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         if (gamepad2.right_stick_x < -0.5) { //Turn the servo to the orange ball storage
 
             color_servo.setPosition(-orange_ball_position);
-            sleep(1000);
+            sleep(sleep1);
             color_servo.setPosition(0.5);
             telemetry.addData("say", "Orange ball score");
-            sleep(1500);
+            sleep(sleep2);
             if (elevator_on) { // turn the elevator back on if the elevator was on
                 startElevator(power);//Anika
             }
@@ -244,10 +238,10 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
             //If the orange ball is detected it pushes it to the orange ball storage
 
             color_servo.setPosition(-orange_ball_position);
-            sleep(1000);
+            sleep(sleep1);
             color_servo.setPosition(0.5);
             telemetry.addData("say", "Orange ball detected");
-            sleep(1500);
+            sleep(sleep2);
             if (elevator_on) { // turn the elevator back on if the elevator was on
                 startElevator(power);//Anika
             }
@@ -256,10 +250,10 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
             //If the blue ball is detected it pushes it to the blue ball storage
 
             color_servo.setPosition(blue_ball_position);
-            sleep(1000);
+            sleep(sleep1);
             color_servo.setPosition(0.5);
             telemetry.addData("say", "Blue ball detected");
-            sleep(1500);
+            sleep(sleep2);
             if (elevator_on) { // turn the elevator back on if the elevator was on
                 startElevator(power);//Anika
             }
@@ -287,24 +281,17 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         linearSlide_motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    private void blueGateOpen(double power, int time){
+    private void blueGateOpen(double postion){
         if(gamepad2.left_trigger > 0.2){
             bGate_open = true;
-//            blueGate.setPower(-power);
-            blueGateServo.setPosition(-1.0);
-            sleep(time);
-//            blueGate.setPower(0);
-            stopElevator();
+            blueGateServo.setPosition(-postion);
         }
     }
 
-    private void blueGateClose(double power, int time){
+    private void blueGateClose(double position){
         if(gamepad2.left_bumper) {
             bGate_open = false;
-            blueGateServo.setPosition(0.9699);
-//            blueGate.setPower(power);
-            sleep(time);
-//            blueGate.setPower(0);
+            blueGateServo.setPosition(position);
         }
     }
 
@@ -312,8 +299,6 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         if(gamepad2.right_trigger > 0.5) {
             oGate_open = true;
             orangeGate_servo.setPosition(position);
-
-            stopElevator();
         }
     }
 
@@ -345,5 +330,3 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         period.reset();
     }
 }
-
-
