@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import static com.qualcomm.robotcore.hardware.Servo.Direction.FORWARD;
 
-@TeleOp(name = "Team_Jamaica",group = "Prize_Bot") // The name of program and bot name
+@TeleOp(name = "Team_Jamaica2",group = "Prized_Bot") // The name of program and bot name
 public class Team_Ja_Fgc_code extends LinearOpMode {
     // Declaration of the objects to be used
     private ElapsedTime period = new ElapsedTime();
@@ -100,7 +100,7 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
 
                 ball_Elevator(minimum_distance,1.0); //elevator system for the balls
 
-                sorting_System(minimum_distance,1.0,1.0,1.0,700,300); //sorting system
+                sorting_System(minimum_distance,1.0,1.0,1.0,300,200); //sorting system
 
                 blueGateOpen(1.0); //function to open the blue ball storage whenever the button is clicked
 
@@ -150,14 +150,6 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         frontLeft.setPower(left);
         frontRight.setPower(right);
 
-        // let the robot brake whenever it stop moving
-        if(left == 0) {
-            left_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        }else if (right==0){
-            right_Motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        }
     }
 
     private void ball_Elevator(int minimum_distance, double power){
@@ -222,17 +214,6 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
                 startElevator(power);//Anika
             }
         }
-        // Mode to collect just blue balls
-        if (gamepad1.dpad_up) { // Turn the servo to the blue ball storage and hold
-            manual_mode = false;
-            color_servo.setPosition(0.6);
-            telemetry.addData("say", "Blue ball only mode on");
-        }
-        if (gamepad1.dpad_down) { // return the servo position to the neutral zone
-            manual_mode = true;
-            color_servo.setPosition(0.5);
-            telemetry.addData("say", "Blue ball only mode off");
-        }
         //automatic ball sorting system
         if (color_red > color_blue && color_value_alpha >= minimum_distance && !manual_mode && !oGate_open) {
             //If the orange ball is detected it pushes it to the orange ball storage
@@ -263,10 +244,9 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
 
     private void linear_Slide(double motion){
         // Lift system controls
-        if(motion != 0){
-            linearSlide_motor1.setPower(motion);
-            linearSlide_motor2.setPower(motion);
-        }else{
+        linearSlide_motor1.setPower(motion);
+        linearSlide_motor2.setPower(motion);
+        if(motion == 0){
             stopLinearSlide();
         }
 
