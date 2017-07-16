@@ -155,7 +155,10 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
 
     private void ball_Elevator(double minimum_distance, double power) {
         //elevator system functionalities
-        if (color_value_distance >= minimum_distance || color_value_distance == NaN) {  // check if balls are in sensing range
+        if(color_value_distance == NaN){
+            telemetry.addData("say","Its working NAN");
+        }
+        if (color_value_distance >= minimum_distance || Double.isNaN(color_value_distance)) {  // check if balls are in sensing range
             if (gamepad2.b || gamepad1.right_bumper) {
                 elevator_on = true; //set  true to show that the elevator is running
                 startElevator(power);
