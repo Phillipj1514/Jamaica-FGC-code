@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.lynx.LynxI2cColorRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -7,17 +8,21 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import static com.qualcomm.robotcore.hardware.Servo.Direction.FORWARD;
 
-@TeleOp(name = "Team_Jamaica2",group = "Prized_Bot") // The name of program and bot name
-public class Team_Ja_Fgc_code extends LinearOpMode {
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+import static com.qualcomm.robotcore.hardware.Servo.Direction.FORWARD;
+import static com.qualcomm.robotcore.hardware.Servo.Direction.REVERSE;
+
+@TeleOp(name = "TEAM_JAMAICA_REAL",group = "Prized_Bot") // The name of program and bot name
+public class TeleOpMode extends LinearOpMode {
     // Declaration of the objects to be used
     private ElapsedTime period = new ElapsedTime();
     private DcMotor left_Motor;
     private DcMotor right_Motor;
     private DcMotor color_sensor_motor;
     private DcMotor color_sensor_motor2;
-    private ColorSensor color_sensor;
+    private LynxI2cColorRangeSensor color_sensor;
     private Servo color_servo;
     private DcMotor linearSlide_motor1;
     private DcMotor linearSlide_motor2;
@@ -26,12 +31,11 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
     private DcMotor frontLeft;
     private Servo blueGateServo;
     //variables
-    private boolean elevator_on, manual_mode = false;
+    public boolean elevator_on=false, manual_mode = false;
     public boolean bGate_open = false, oGate_open = false;
     private int color_red = 0;
     private int color_blue = 0;
-    private int color_value_alpha = 0;
-    private int color_value_argb = 0;
+    private double color_value_distance = 0;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -42,7 +46,8 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         //initialization of electronics
         left_Motor = hardwareMap.dcMotor.get("left_drive");
         right_Motor = hardwareMap.dcMotor.get("right_drive");
-        color_sensor = hardwareMap.colorSensor.get("color_sensor");
+        //color_sensor = hardwareMap.colorSensor.get("color_sensor");
+        color_sensor = hardwareMap.get(LynxI2cColorRangeSensor.class, "color_sensor");
         color_servo = hardwareMap.servo.get("col_servo");
         orangeGate_servo = hardwareMap.servo.get("orange_gate");
         color_sensor_motor = hardwareMap.dcMotor.get("col_motor");
@@ -55,6 +60,7 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
 
         //motor and sensor configuration
         right_Motor.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         linearSlide_motor1.setDirection(DcMotorSimple.Direction.REVERSE);
         color_servo.setDirection(FORWARD);
         blueGateServo.setDirection(FORWARD);
@@ -73,7 +79,7 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         double left = 0.0;
         double right = 0.0;
         double motion = 0.0;
-        int minimum_distance = 40; // the minimum distance of the proximity / color sensor
+        double minimum_distance = 60; // the minimum distance of the proximity / color sensor
 
         // Send message to tablet showing that robot is ready and wait until start is pressed
         telemetry.addData("Say", "READY TO ROLL"); //
@@ -88,8 +94,7 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
                 //auxiliary  variable declaration and initialization
                 color_red = color_sensor.red();
                 color_blue = color_sensor.blue();
-                color_value_alpha = color_sensor.alpha();
-                color_value_argb = color_sensor.argb();
+                color_value_distance = color_sensor.getDistance(DistanceUnit.MM);
                 left = -gamepad1.left_stick_y;
                 right = -gamepad1.right_stick_y;
                 motion = -gamepad2.left_stick_y;
@@ -117,8 +122,7 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
                 telemetry.addData("Right wheel:", "%.2f", right);
                 telemetry.addData("color sensor: Red Channel", "%d", color_red);
                 telemetry.addData("color sensor: Blue Channel", "%d", color_blue);
-                telemetry.addData("color sensor: alpha Channel", "%d", color_value_alpha);
-                telemetry.addData("color sensor: argb Channel", "%d", color_value_argb);
+                telemetry.addData("color sensor: Distance Channel", "%f", color_value_distance);
 
                 // update the telemetry after each run to ensure your always up to date
                 telemetry.update();
@@ -149,24 +153,21 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         right_Motor.setPower(right);
         frontLeft.setPower(left);
         frontRight.setPower(right);
-
     }
 
-    private void ball_Elevator(int minimum_distance, double power){
+    private void ball_Elevator(double minimum_distance, double power) {
         //elevator system functionalities
-        if (color_value_alpha <= minimum_distance) {  // check if balls are in sensing range
+        if (color_value_distance >= minimum_distance) {  // check if balls are in sensing range
             if (gamepad2.b || gamepad1.right_bumper) {
                 elevator_on = true; //set  true to show that the elevator is running
                 startElevator(power);
             }
-        } else {
-            //turn the motors off if a ball is being sensed
-            color_sensor_motor.setPower(0);
-            color_sensor_motor2.setPower(0);
-        }
 
-        if (gamepad2.a || gamepad1.left_bumper) { // turn off button for elevator
-            elevator_on = false;
+            if (gamepad2.a || gamepad1.left_bumper) { // turn off button for elevator
+                elevator_on = false;
+                stopElevator();
+            }
+        }else{
             stopElevator();
         }
     }
@@ -181,7 +182,7 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         color_sensor_motor2.setPower(-power);
     }
 
-    private void sorting_System(int minimum_distance, double orange_ball_position, double blue_ball_position,double power, int sleep1, int sleep2){
+    private void sorting_System(double minimum_distance, double orange_ball_position, double blue_ball_position,double power, int sleep1, int sleep2){
         // The codes for the sorting action
         if (gamepad2.x) { // Turn on manual mode for the sorting system
             manual_mode = true;
@@ -215,7 +216,7 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
             }
         }
         //automatic ball sorting system
-        if (color_red > color_blue && color_value_alpha >= minimum_distance && !manual_mode && !oGate_open) {
+        if (color_red > color_blue && color_value_distance <= minimum_distance && !manual_mode && !oGate_open) {
             //If the orange ball is detected it pushes it to the orange ball storage
 
             color_servo.setPosition(-orange_ball_position);
@@ -227,7 +228,7 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
                 startElevator(power);//Anika
             }
 
-        } else if (color_red < color_blue && color_value_alpha >= minimum_distance && !manual_mode && !bGate_open) {// gate boolean added by Anika
+        } else if (color_red < color_blue && color_value_distance <= minimum_distance && !manual_mode && !bGate_open) {// gate boolean added by Anika
             //If the blue ball is detected it pushes it to the blue ball storage
 
             color_servo.setPosition(blue_ball_position);
