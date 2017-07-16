@@ -3,21 +3,17 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.lynx.LynxI2cColorRangeSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.w3c.dom.NamedNodeMap;
-
 import static com.qualcomm.robotcore.hardware.Servo.Direction.FORWARD;
 import static com.qualcomm.robotcore.hardware.Servo.Direction.REVERSE;
 import static java.lang.Float.NaN;
 
 @TeleOp(name = "TEAM_JAMAICA_REAL",group = "Prized_Bot") // The name of program and bot name
-public class TeleOpMode extends LinearOpMode {
+public class Team_Ja_Fgc_code extends LinearOpMode {
     // Declaration of the objects to be used
     private ElapsedTime period = new ElapsedTime();
     private DcMotor left_Motor;
