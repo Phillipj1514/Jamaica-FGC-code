@@ -10,9 +10,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.w3c.dom.NamedNodeMap;
 
 import static com.qualcomm.robotcore.hardware.Servo.Direction.FORWARD;
 import static com.qualcomm.robotcore.hardware.Servo.Direction.REVERSE;
+import static java.lang.Float.NaN;
 
 @TeleOp(name = "TEAM_JAMAICA_REAL",group = "Prized_Bot") // The name of program and bot name
 public class TeleOpMode extends LinearOpMode {
@@ -157,7 +159,7 @@ public class TeleOpMode extends LinearOpMode {
 
     private void ball_Elevator(double minimum_distance, double power) {
         //elevator system functionalities
-        if (color_value_distance >= minimum_distance) {  // check if balls are in sensing range
+        if (color_value_distance >= minimum_distance || color_value_distance == NaN) {  // check if balls are in sensing range
             if (gamepad2.b || gamepad1.right_bumper) {
                 elevator_on = true; //set  true to show that the elevator is running
                 startElevator(power);
@@ -170,6 +172,7 @@ public class TeleOpMode extends LinearOpMode {
         }else{
             stopElevator();
         }
+
     }
 
     private void stopElevator(){
