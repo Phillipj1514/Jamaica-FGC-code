@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.SwitchableLight;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import static com.qualcomm.robotcore.hardware.Servo.Direction.FORWARD;
@@ -31,6 +32,7 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
     //variables
     public boolean elevator_on=false, manual_mode = false;
     public boolean bGate_open = false, oGate_open = false;
+    public boolean RampDriveMode=false;
     private int color_red = 0;
     private int color_blue = 0;
     private double color_value_distance = 0;
@@ -55,6 +57,7 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         frontRight= hardwareMap.dcMotor.get("frontright");
         frontLeft= hardwareMap.dcMotor.get("frontleft");
         blueGateServo=hardwareMap.servo.get("blueGateServo");
+
 
         //motor and sensor configuration
         right_Motor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -97,7 +100,12 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
                 right = -gamepad1.right_stick_y;
                 motion = -gamepad2.left_stick_y;
 
+               if(color_sensor.isLightOn()==true){
+                   color_sensor.enableLed(false);
+               }
+
                 //controller command function and functionality
+
 
                 drive_control(left, right); // mobility code for the drive wheels
 
@@ -114,6 +122,8 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
                 orangeGateClose(0); //function to close the orange ball storage whenever the button is clicked
 
                 linear_Slide(motion); //linear slide movement function
+
+                RampDrive(left, right);
 
                 // logging information to user that is necessary
                 telemetry.addData("Left wheel: ", "%.2f", left);
@@ -152,7 +162,6 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
         frontLeft.setPower(left);
         frontRight.setPower(right);
     }
-
     private void ball_Elevator(double minimum_distance, double power) {
         //elevator system functionalities
         if(color_value_distance == NaN){
@@ -291,9 +300,35 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
             orangeGate_servo.setPosition(position);
         }
     }
-    private void rampdrive(){
-//  SOME PROCESS
-    }
+
+    private  void RampDrive(double left, double right){
+        if(gamepad1.x){
+            RampDriveMode=true;
+        }
+        if(RampDriveMode){
+            if(left>0.8) {
+                left = 0.3;
+            }
+            if(right>0.8) {
+                right = 0.3;
+            }
+            if (left< -0.8){
+                left=-0.3;
+            }
+            if (right< -0.8){
+                right=-0.3;
+            }
+
+            left_Motor.setPower(left);
+            right_Motor.setPower(right);
+            frontLeft.setPower(left);
+            frontRight.setPower(right);
+        }
+        if (gamepad1.y){
+            RampDriveMode=false;
+        }
+
+   }
     //The Processor ticking time code
     /***
      * waitForTick implements a periodic delay. However, this acts like a metronome
