@@ -204,7 +204,7 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
             telemetry.addData("say", "Manual mode off");
         }
         //manual control for servo
-        if (gamepad2.right_stick_x > 0.5) { // Turn the servo to the blue ball storage
+        if (gamepad2.right_stick_x < -0.5) { // Turn the servo to the blue ball storage
 
             color_servo.setPosition(blue_ball_position);
             sleep(sleep1);
@@ -215,7 +215,7 @@ public class Team_Ja_Fgc_code extends LinearOpMode {
                 startElevator(power);//Anika
             }
         }
-        if (gamepad2.right_stick_x < -0.5) { //Turn the servo to the orange ball storage
+        if (gamepad2.right_stick_x > 0.5) { //Turn the servo to the orange ball storage
 
             color_servo.setPosition(-orange_ball_position);
             sleep(sleep1);
